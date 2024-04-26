@@ -1,0 +1,42 @@
+<!-- view_farms.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Farms</title>
+</head>
+<body>
+    <h1>List of Farms</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Barangay</th>
+                <th>City or Municipality</th>
+                <th>Country</th>
+                <th>Acres</th>
+                <th>Crops Planted</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for farm in farms %}
+            <tr>
+                <td>{{ farm.farm_id }}</td>
+                <td>{{ farm.barangay }}</td>
+                <td>{{ farm.city_or_municipality }}</td>
+                <td>{{ farm.country }}</td>
+                <td>{{ farm.acres }}</td>
+                <td>{{ farm.crops_planted }}</td>
+                <td>
+                    <a href="{% url 'update_farm' farm.farm_id %}">Update</a>
+                    <a href="{% url 'delete_farm' farm.farm_id %}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

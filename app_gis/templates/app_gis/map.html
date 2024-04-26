@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Map</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Button to redirect to another page -->
+    <a href="{% url 'add_farm' %}"><button>Add Farm</button></a>
+    <div id="map"></div>
+
+    <script>
+
+        // Default coordinates
+        var defaultLongitude = 123.876705;
+        var defaultLatitude = 10.308258;
+
+        //renders the map
+        mapboxgl.accessToken = '{{ mapbox_access_token }}';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/satellite-streets-v11',
+            center: [defaultLongitude, defaultLatitude],
+            zoom: 12
+        });
+
+        //add markers on the map
+        {% for farm in farms %}
+        new mapboxgl.Marker()
+            .setLngLat([{{ farm.longitude }}, {{ farm.latitude }}])
+            .setPopup(new mapboxgl.Popup().setHTML('<h3>{{ farm.full_address }}</h3>'))
+            .addTo(map);
+        {% endfor %}
+    </script>
+</body>
+
+</html>

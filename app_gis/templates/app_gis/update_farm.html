@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Farm</title>
+</head>
+
+<body>
+    <h1>Update Farm</h1>
+    <form action="{% url 'update_farm' farm_id=farm.pk %}" method="post">
+        {% csrf_token %}
+        <!-- Render form fields for updating farm details -->
+        <fieldset>
+            <legend>Address Information</legend>
+            {{ address_form.as_p }}
+        </fieldset>
+        <fieldset>
+            <legend>Farm Details</legend>
+            {{ farmdetails_form.as_p }}
+        </fieldset>
+        <button type="submit">Update</button>
+    </form>
+</body>
+
+</html>

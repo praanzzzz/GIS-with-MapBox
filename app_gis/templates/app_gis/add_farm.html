@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Farm</title>
+    <!-- Link to Mapbox CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
+    <!-- Link to Mapbox JavaScript library -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <!-- Link to jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- CSS styles for layout -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 50%;
+        }
+
+        #form-container {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Map container -->
+    <div id="map"></div>
+    <!-- Form container -->
+    <div id="form-container">
+        <!-- Form for adding farm details -->
+        <h1>Add Farm</h1>
+        <form method="post">
+            {% csrf_token %}
+            <!-- Render address input fields -->
+            {{ address_form.as_p }}
+            <!-- Render farm details input fields -->
+            {{ details_form.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+        <!-- Storage for the longitude and latitude coordinates -->
+        <div id="coordinates" style="display: none;" data-longitude="{{ coordinates.longitude }}"
+            data-latitude="{{ coordinates.latitude }}"></div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Get longitude and latitude from HTML attributes
+            var longitude = parseFloat(document.getElementById('coordinates').getAttribute('data-longitude'));
+            var latitude = parseFloat(document.getElementById('coordinates').getAttribute('data-latitude'));
+
+            // Set Mapbox access token
+            mapboxgl.accessToken = 'pk.eyJ1IjoiZnJhbnpnYWJpamFuIiwiYSI6ImNsdmV3dTljbTBlbzkya3BlY2Rwa28xczgifQ.z1HHDbS-prv9A3gwQJK43A';
+
+            // Default coordinates
+            var defaultLongitude = 123.876705;
+            var defaultLatitude = 10.308258;
+
+            // Initialize map with default coordinates
+            var defaultMap = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11',
+                center: [defaultLongitude, defaultLatitude],
+                zoom: 12,
+            });
+
+            // Initialize map with user coordinates
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11',
+                center: [longitude, latitude],
+                zoom: 12,
+            });
+
+            // Add marker to the map
+            var marker = new mapboxgl.Marker()
+                .setLngLat([longitude, latitude])
+                .addTo(map);
+
+            // Function to set the marker position and update address input fields
+            function setMarkerAndAddress(coordinates) {
+                marker.setLngLat(coordinates);
+                // Add code here to update the address input fields based on the new coordinates
+            }
+
+            // Add click event listener to map
+            map.on('click', function (e) {
+                // Get clicked coordinates
+                var coordinates = [e.lngLat.lng, e.lngLat.lat];
+                // Set marker and update address input fields
+                setMarkerAndAddress(coordinates);
+            });
+        });
+    </script>
+</body>
+
+</html>

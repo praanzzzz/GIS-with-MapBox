@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta tags for character set and viewport -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Page title -->
+    <title>Mapbox Marker</title>
+    <!-- Mapbox JavaScript library -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.js"></script>
+    <!-- Mapbox CSS stylesheet -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css" rel="stylesheet">
+    <!-- CSS styles for map container -->
+    <style>
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Button to redirect to another page -->
+    <a href="{% url 'add_farm' %}"><button>Go to Redirected Page</button></a>
+    <!-- Form for entering address -->
+
+
+    <form id="addressForm">
+        {% csrf_token %}
+        <input type="text" id="addressInput" placeholder="Enter address">
+        <button type="submit">Submit</button>
+    </form>
+
+    
+    <!-- Map container -->
+    <div id="map"></div>
+    <!-- JavaScript code -->
+    <script>
+        // Set Mapbox access token
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZnJhbnpnYWJpamFuIiwiYSI6ImNsdmV3dTljbTBlbzkya3BlY2Rwa28xczgifQ.z1HHDbS-prv9A3gwQJK43A';
+
+        // Default coordinates
+        var defaultLongitude = 123.876705;
+        var defaultLatitude = 10.308258;
+
+        // Initialize map with default coordinates
+        let map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [defaultLongitude, defaultLatitude],
+            zoom: 8
+        });
+
+        let marker; // Variable to store marker
+
+        // Event listener for form submission
+        document.getElementById('addressForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent form submission
+            geocodeAddress(); // Call geocodeAddress function
+        });
+
+        // Function to geocode the entered address
+        function geocodeAddress() {
+            const address = document.getElementById("addressInput").value; // Get address from input field
+
+            // Fetch request to Mapbox Geocoding API
+            fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/' + encodeURIComponent(address) + '.json?access_token=' + mapboxgl.accessToken)
+                .then(response => response.json()) // Parse response as JSON
+                .then(data => {
+                    const location = data.features[0].center; // Get coordinates from response
+                    map.setCenter(location); // Set map center to the geocoded location
+
+                    // Remove previous marker if it exists
+                    if (marker) {
+                        marker.remove();
+                    }
+
+                    // Add new draggable marker at the geocoded location
+                    marker = new mapboxgl.Marker({
+                        draggable: true
+                    })
+                        .setLngLat(location)
+                        .addTo(map);
+
+                    // Add event listener for marker drag
+                    marker.on('dragend', function () {
+                        const lngLat = marker.getLngLat(); // Get marker position
+                        updateMarkerPosition(lngLat); // Call updateMarkerPosition function
+                    });
+                })
+                .catch(error => console.error('Error:', error)); // Log any errors to console
+        }
+
+        // Function to update input field with marker position
+        function updateMarkerPosition(lngLat) {
+            document.getElementById('addressInput').value = lngLat.lng + ', ' + lngLat.lat; // Update input field value
+        }
+    </script>
+</body>
+
+</html>
+
+
+<!-- This HTML document contains a form for entering an address and a Mapbox map. When the form is submitted, the entered address
+is geocoded using the Mapbox Geocoding API, and the map is centered on the resulting coordinates. A draggable marker 
+is added to the map at the geocoded location. If the marker is dragged to a new location, the input field is updated
+with the new coordinates. -->
